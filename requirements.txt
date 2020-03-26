@@ -1,7 +1,3 @@
-numpy
-scikit-learn
-pandas
-geopandas
-tqdm
-ngram
-gensim
+version https://git-lfs.github.com/spec/v1
+oid sha256:5d4ece15e573e2282789a3384a532b4dbc0897590e90ec147c85d865ccd593db
+size 53
