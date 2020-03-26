@@ -6,7 +6,9 @@ In this project, I propose a python script to compute the similarity between cou
 
 
 ![MX_example](example_MX.png)
-<p style="text-align:center">Example of map generated on Mexico</p>
+
+<p align="center">Example of map generated on Mexico</p>
+
 # Clone the git repo
 
     $ git clone https://github.com/Jacobe2169/mapthetoponymsim.git
