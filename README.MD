@@ -1,5 +1,5 @@
 # Map the similarities between countries toponyms 
-
+(in progress)
 # Clone the git repo
 
     $ git clone https://github.com/Jacobe2169/mapthetoponymsim.git
