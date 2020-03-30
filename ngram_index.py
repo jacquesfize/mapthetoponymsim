@@ -4,8 +4,6 @@ import numpy as np
 
 from ngram import NGram
 
-# Machine learning 
-from gensim.models import Word2Vec
 
 class NgramIndex():
     """
@@ -101,29 +99,6 @@ class NgramIndex():
         diff = MAX_LEN - len(ngram_encoding)
         ngram_encoding.extend([filling_item]*diff)  
         return ngram_encoding
-    
-    def get_embedding_layer(self,texts,dim=100,**kwargs):
-        """
-        Return an embedding matrix for each ngram using encoded texts. Using gensim.Word2vec model.
-        
-        Parameters
-        ----------
-        texts : list of [list of int]
-            list of encoded word
-        dim : int, optional
-            embedding dimension, by default 100
-        
-        Returns
-        -------
-        np.array
-            embedding matrix
-        """
-        model = Word2Vec([[str(w) for w in t] for t in texts], size=dim,window=5, min_count=1, workers=4,**kwargs)
-        N = len(self.ngram_index)
-        embedding_matrix = np.zeros((N,dim))
-        for i in range(N):
-            embedding_matrix[i] = model.wv[str(i)]
-        return embedding_matrix
 
     def save(self,fn):
         """
