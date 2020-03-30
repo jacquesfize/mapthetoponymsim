@@ -11,7 +11,7 @@ df = read_geonames("allCountries.txt")
 df = df[df.feature_class.isin("A P".split())]
 
 ng_index = NgramIndex(n=4)
-df.name.progress_apply(ng_index.split_and_add)
+df["name"].progress_apply(ng_index.split_and_add)
 
 c_codes = df.country_code.unique()
 m_count = np.zeros((len(c_codes),len(ng_index.ngram_index)))
@@ -19,7 +19,7 @@ m_count = np.zeros((len(c_codes),len(ng_index.ngram_index)))
 countrycode_index = {c_codes[i]:i for i in range(len(c_codes))}
 
 for ix,row in tqdm(df.iterrows(),total=len(df)):
-    encoded = ng_index.encode(str(row.name))
+    encoded = ng_index.encode(str(row["name"]))
     country_index = countrycode_index[row.country_code]
     for e in encoded:
         m_count[country_index][e]+=1
@@ -67,7 +67,7 @@ for c_code in world.ISO2.values:
     world["sim_{0}".format(c_code)] = world.ISO2.apply(lambda x : sim_vec[countrycode_index[x]] if x in countrycode_index else 0)
 
 
-sim_vec = world[world.ISO2 == "MX"].iloc[0].sim_vec
+sim_vec = world[world.ISO2 == "FR"].iloc[0].sim_vec
 world["simtoselected"] = world.ISO2.apply(lambda x : sim_vec[countrycode_index[x]] if x in countrycode_index else 0)
 fig, ax = plt.subplots(1, 1)
 world.plot(column='simtoselected', ax=ax, legend=True)
