@@ -3,6 +3,8 @@ test*
 allCountries*
 Untitled.ipynb
 simtoponyms.geojson/
+.vscode/
+notebooks*
 
 # MACOS
 .DS_Store
