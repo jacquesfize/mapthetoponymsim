@@ -79,6 +79,9 @@
             errors. Here, such representation is used to capture the association between an affix and specific region. For example, the prefix "tre" is commonly used in Bretagne (region in France) because it means "populated places" in the local language.
             Once toponyms are encoded, we produce a vector that keep counts of ngram occurrences in each country toponyms (basically a Bag-of-Words!). Finally, the cosine similarity is used to compute the similarity between these vectors.
         </p>
+
+        <p>
+            The following map allows you to display the toponyms similarities of each country with a specific one. For example, if you select "FR", you can see that Belgium and Canada toponyms are highly similar with the ones from France. </p>
         <div id="country_selector" class="form-group row" style="margin-left: 0.3em;">
             <label class="col-form-label" for="exampleFormControlSelect1">Select a country</label>
             <select class="form-control col-lg-2" id="exampleFormControlSelect1">
