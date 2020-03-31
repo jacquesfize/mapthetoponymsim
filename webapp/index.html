@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map the countries' toponyms similarities</title>
+    <!-- BOOTSTRAP -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- LEAFLET -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+    <!-- FONTS GOOGLE -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/f93d2887d3.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+
+</head>
+
+<body style="font-family: 'Sen', sans-serif;">
+    <style>
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+        
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        
+        body {
+            /* margin-bottom: 60px; */
+            /* Margin bottom by footer height */
+        }
+        
+        .footer {
+            width: 100%;
+            height: 60px;
+            /* Set the fixed height of the footer here */
+            line-height: 60px;
+            /* Vertically center the text there */
+            background-color: #f5f5f5;
+            z-index: 999;
+        }
+    </style>
+    <div class="container">
+
+        <h1>
+            <i class="fas fa-globe-europe"></i> Map the similarities between countries toponyms
+        </h1>
+        <hr>
+        <p>
+            In this experiment, we collect toponyms from the Geonames dataset. To compute the similarity, toponyms are encoded in a character n-gram sequence (e.g. Paris --> {$$$P,$$Pa,$Par,Pari,...}). Character ngram are widely known to be flexible in terms of spelling
+            errors. Here, such representation is used to capture the association between an affix and specific region. For example, the prefix "tre" is commonly used in Bretagne (region in France) because it means "populated places" in the local language.
+            Once toponyms are encoded, we produce a vector that keep counts of ngram occurrences in each country toponyms (basically a Bag-of-Words!). Finally, the cosine similarity is used to compute the similarity between these vectors.
+        </p>
+        <div id="country_selector" class="form-group row" style="margin-left: 0.3em;">
+            <label class="col-form-label" for="exampleFormControlSelect1">Select a country</label>
+            <select class="form-control col-lg-2" id="exampleFormControlSelect1">
+                    <option >AD</option>
+                    <option>AE</option>
+                    <option>AF</option>
+                    <option>AG</option>
+                    <option>AI</option>
+                    <option>AL</option>
+                    <option>AM</option>
+                    <option>AN</option>
+                    <option>AO</option>
+                    <option>AQ</option>
+                    <option>AR</option>
+                    <option>AS</option>
+                    <option>AT</option>
+                    <option>AU</option>
+                    <option>AW</option>
+                    <option>AX</option>
+                    <option>AZ</option>
+                    <option>BA</option>
+                    <option>BB</option>
+                    <option>BD</option>
+                    <option>BE</option>
+                    <option>BF</option>
+                    <option>BG</option>
+                    <option>BH</option>
+                    <option>BI</option>
+                    <option>BJ</option>
+                    <option>BL</option>
+                    <option>BM</option>
+                    <option>BN</option>
+                    <option>BO</option>
+                    <option>BR</option>
+                    <option>BS</option>
+                    <option>BT</option>
+                    <option>BV</option>
+                    <option>BW</option>
+                    <option>BY</option>
+                    <option>BZ</option>
+                    <option>CA</option>
+                    <option>CC</option>
+                    <option>CD</option>
+                    <option>CF</option>
+                    <option>CG</option>
+                    <option>CH</option>
+                    <option>CI</option>
+                    <option>CK</option>
+                    <option>CL</option>
+                    <option>CM</option>
+                    <option>CN</option>
+                    <option>CO</option>
+                    <option>CR</option>
+                    <option>CU</option>
+                    <option>CV</option>
+                    <option>CX</option>
+                    <option>CY</option>
+                    <option>CZ</option>
+                    <option>DE</option>
+                    <option>DJ</option>
+                    <option>DK</option>
+                    <option>DM</option>
+                    <option>DO</option>
+                    <option>DZ</option>
+                    <option>EC</option>
+                    <option>EE</option>
+                    <option>EG</option>
+                    <option>EH</option>
+                    <option>ER</option>
+                    <option>ES</option>
+                    <option>ET</option>
+                    <option>FI</option>
+                    <option>FJ</option>
+                    <option>FK</option>
+                    <option>FM</option>
+                    <option>FO</option>
+                    <option selected>FR</option>
+                    <option>GA</option>
+                    <option>GB</option>
+                    <option>GD</option>
+                    <option>GE</option>
+                    <option>GF</option>
+                    <option>GG</option>
+                    <option>GH</option>
+                    <option>GI</option>
+                    <option>GL</option>
+                    <option>GM</option>
+                    <option>GN</option>
+                    <option>GP</option>
+                    <option>GQ</option>
+                    <option>GR</option>
+                    <option>GS</option>
+                    <option>GT</option>
+                    <option>GU</option>
+                    <option>GW</option>
+                    <option>GY</option>
+                    <option>HK</option>
+                    <option>HM</option>
+                    <option>HN</option>
+                    <option>HR</option>
+                    <option>HT</option>
+                    <option>HU</option>
+                    <option>ID</option>
+                    <option>IE</option>
+                    <option>IL</option>
+                    <option>IM</option>
+                    <option>IN</option>
+                    <option>IO</option>
+                    <option>IQ</option>
+                    <option>IR</option>
+                    <option>IS</option>
+                    <option>IT</option>
+                    <option>JE</option>
+                    <option>JM</option>
+                    <option>JO</option>
+                    <option>JP</option>
+                    <option>KE</option>
+                    <option>KG</option>
+                    <option>KH</option>
+                    <option>KI</option>
+                    <option>KM</option>
+                    <option>KN</option>
+                    <option>KP</option>
+                    <option>KR</option>
+                    <option>KW</option>
+                    <option>KY</option>
+                    <option>KZ</option>
+                    <option>LA</option>
+                    <option>LB</option>
+                    <option>LC</option>
+                    <option>LI</option>
+                    <option>LK</option>
+                    <option>LR</option>
+                    <option>LS</option>
+                    <option>LT</option>
+                    <option>LU</option>
+                    <option>LV</option>
+                    <option>LY</option>
+                    <option>MA</option>
+                    <option>MC</option>
+                    <option>MD</option>
+                    <option>ME</option>
+                    <option>MF</option>
+                    <option>MG</option>
+                    <option>MH</option>
+                    <option>MK</option>
+                    <option>ML</option>
+                    <option>MM</option>
+                    <option>MN</option>
+                    <option>MO</option>
+                    <option>MP</option>
+                    <option>MQ</option>
+                    <option>MR</option>
+                    <option>MS</option>
+                    <option>MT</option>
+                    <option>MU</option>
+                    <option>MV</option>
+                    <option>MW</option>
+                    <option>MX</option>
+                    <option>MY</option>
+                    <option>MZ</option>
+                    <option>NA</option>
+                    <option>NC</option>
+                    <option>NE</option>
+                    <option>NF</option>
+                    <option>NG</option>
+                    <option>NI</option>
+                    <option>NL</option>
+                    <option>NO</option>
+                    <option>NP</option>
+                    <option>NR</option>
+                    <option>NU</option>
+                    <option>NZ</option>
+                    <option>OM</option>
+                    <option>PA</option>
+                    <option>PE</option>
+                    <option>PF</option>
+                    <option>PG</option>
+                    <option>PH</option>
+                    <option>PK</option>
+                    <option>PL</option>
+                    <option>PM</option>
+                    <option>PN</option>
+                    <option>PR</option>
+                    <option>PS</option>
+                    <option>PT</option>
+                    <option>PW</option>
+                    <option>PY</option>
+                    <option>QA</option>
+                    <option>RE</option>
+                    <option>RO</option>
+                    <option>RS</option>
+                    <option>RU</option>
+                    <option>RW</option>
+                    <option>SA</option>
+                    <option>SB</option>
+                    <option>SC</option>
+                    <option>SD</option>
+                    <option>SE</option>
+                    <option>SG</option>
+                    <option>SH</option>
+                    <option>SI</option>
+                    <option>SJ</option>
+                    <option>SK</option>
+                    <option>SL</option>
+                    <option>SM</option>
+                    <option>SN</option>
+                    <option>SO</option>
+                    <option>SR</option>
+                    <option>ST</option>
+                    <option>SV</option>
+                    <option>SY</option>
+                    <option>SZ</option>
+                    <option>TC</option>
+                    <option>TD</option>
+                    <option>TF</option>
+                    <option>TG</option>
+                    <option>TH</option>
+                    <option>TJ</option>
+                    <option>TK</option>
+                    <option>TL</option>
+                    <option>TM</option>
+                    <option>TN</option>
+                    <option>TO</option>
+                    <option>TR</option>
+                    <option>TT</option>
+                    <option>TV</option>
+                    <option>TW</option>
+                    <option>TZ</option>
+                    <option>UA</option>
+                    <option>UG</option>
+                    <option>UM</option>
+                    <option>US</option>
+                    <option>UY</option>
+                    <option>UZ</option>
+                    <option>VA</option>
+                    <option>VC</option>
+                    <option>VE</option>
+                    <option>VG</option>
+                    <option>VI</option>
+                    <option>VN</option>
+                    <option>VU</option>
+                    <option>WF</option>
+                    <option>WS</option>
+                    <option>YE</option>
+                    <option>YT</option>
+                    <option>ZA</option>
+                    <option>ZM</option>
+                    <option>ZW</option>
+                </select>
+        </div>
+
+
+        <div id="mapid" class="col-lg-12" style=" height: 600px;"></div>
+        <footer class="footer">
+            <div class="container">
+
+                <span class="text-muted">Made with <i class="icon ion-heart"></i> by Jacques Fize. Code is available <a href="https://github.com/Jacobe2169/mapthetoponymsim">here</a></span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="data/SIMTOPO_WORLD_COUNTRIES.geojson"></script>
+    <script>
+        var country_selected = "FR";
+
+        function getColor(d) {
+            return d > 1 ? '#800026' :
+                d >= 0.75 ? '#BD0026' :
+                d >= 0.5 ? '#E31A1C' :
+                d >= 0.25 ? '#FC4E2A' :
+                d >= 0 ? '#FED976' :
+                '#FFEDA0';
+        }
+
+        function style(feature) {
+            return {
+                fillColor: (feature.properties.ISO2 == country_selected ? "green" : getColor(feature.properties["sim_" + country_selected])),
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        }
+
+        var map = L.map('mapid').setView([51.505, -0.09], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var layerTOPO = L.geoJson(topo, {
+            style: style
+        }).addTo(map);
+
+        function change_country(country) {
+            country_selected = country;
+            layerTOPO.eachLayer(function(layer) {
+
+                layer.setStyle(style(layer.feature));
+
+            });
+        }
+
+        $('#country_selector .form-control').change(function() {
+            var id_country = $(this).children('option:selected').text();
+            change_country(id_country);
+        });
+        var legend = L.control({
+            position: 'topright'
+        });
+
+        legend.onAdd = function(map) {
+
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 0.25, 0.50, 0.75, 1],
+                labels = [];
+
+            div.innerHTML += "<p><strong>Legend</strong></p>";
+            div.innerHTML += "<span><em>Similarity Value</em></span><br>";
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                if (grades[i] == 1) {
+                    break
+                }
+                div.innerHTML +=
+                    '<i style="background:' + getColor(grades[i]) + '"></i> ' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+            div.innerHTML += "<br><span><em>Other</em></span><br>";
+            div.innerHTML += '<i style="background:' + "green" + '"></i> ' + "Country Selected" + '<br>';
+            return div;
+        };
+
+        legend.addTo(map);
+    </script>
+</body>
+
+</html>
